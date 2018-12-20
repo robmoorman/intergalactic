@@ -1,0 +1,46 @@
+version: "3"
+services:
+  node1:
+    build: .
+    ports:
+      - "8001:5001"
+  node2:
+    build: .
+    links:
+      - node1
+    ports:
+      - "8002:5001"
+    environment:
+      - BOOTSTRAP_PEERS=ws://node1:5001
+  node3:
+    build: .
+    links:
+      - node2
+    ports:
+      - "8003:5001"
+    environment:
+      - BOOTSTRAP_PEERS=ws://node2:5001
+  node4:
+    build: .
+    links:
+      - node3
+    ports:
+      - "8004:5001"
+    environment:
+      - BOOTSTRAP_PEERS=ws://node3:5001
+  node5:
+    build: .
+    links:
+      - node4
+    ports:
+      - "8005:5001"
+    environment:
+      - BOOTSTRAP_PEERS=ws://node4:5001
+  node6:
+    build: .
+    links:
+      - node5
+    ports:
+      - "8006:5001"
+    environment:
+      - BOOTSTRAP_PEERS=ws://node5:5001
