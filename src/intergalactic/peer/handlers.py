@@ -100,7 +100,7 @@ async def handle_notify_new_peers(ws, data):
     new_peers = [x for x in parent_peers if x not in current_peers]
 
     if len(new_peers):
-        logger.info(f"Discoved new peers {new_peers}")
+        logger.info(f"Discovered new peers {new_peers}")
 
         for peer in new_peers:
             loop = asyncio.get_event_loop()

@@ -11,7 +11,7 @@ Yet another P2P blockchain.
 
 ### Virtualenv
 
-Check your Python version (we recommand using Python 3.7)
+Check your Python version (we recommend to use Python 3.7)
 
 ```
 $ python3 -v
