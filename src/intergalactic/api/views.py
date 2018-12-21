@@ -18,6 +18,7 @@ from sanic.views import HTTPMethodView
 
 from intergalactic import settings
 from intergalactic.blockchain.blockchain import blockchain
+from intergalactic.peer.publisher import broadcast
 from intergalactic.types import MessageType
 
 
@@ -32,14 +33,9 @@ class MineBlockView(HTTPMethodView):
     """Mine block view class."""
 
     async def post(self, request):
-        from intergalactic.peer.publisher import broadcast
-
         # Mine a new block
         block = blockchain.mine_block()
         block_dict = block.to_dict()
-
-        # Add the new block to the blockchain
-        blockchain.add_block(block)
 
         # Broadcast new block to the network
         await broadcast({
@@ -48,3 +44,36 @@ class MineBlockView(HTTPMethodView):
         })
 
         return json({"block": block_dict})
+
+
+class AddTransactionView(HTTPMethodView):
+    """Add transation view class."""
+
+    async def post(self, request):
+        data = request.json
+        transaction = None
+
+        if data is not None:
+            sender = data["sender"]
+            recipient = data["recipient"]
+            amount = data["amount"]
+            signature = data["signature"]
+
+            # Create a new transaction
+            transaction = blockchain.create_transaction(
+                sender, recipient, amount, signature)
+
+        if not transaction:
+            return json({
+                "error": "Invalid transaction"
+            }, status=400)
+
+        transaction_dict = transaction.to_dict()
+
+        # Broadcast new transaction to the network
+        await broadcast({
+            "type": MessageType.NOTIFY_NEW_TRANSACTION.value,
+            "data": transaction_dict
+        })
+
+        return json({"transaction": transaction_dict})

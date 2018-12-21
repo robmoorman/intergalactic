@@ -14,7 +14,7 @@ Yet another P2P blockchain.
 Check your Python version (we recommend to use Python 3.7)
 
 ```
-$ python3 -v
+$ python3 --version
 ```
 
 Make a virtualenv and activate it

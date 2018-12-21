@@ -2,6 +2,7 @@ bin/
 include/
 lib/
 src/intergalactic/.db
+scripts/
 *.egg-info
 *.pyc
 pip-selfcheck.json

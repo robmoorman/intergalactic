@@ -17,7 +17,7 @@ from os import environ as env
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DEBUG = False
+DEBUG = True
 
 BLOCKCHAIN_DB_PATH = os.path.join(BASE_DIR, '.db')
 

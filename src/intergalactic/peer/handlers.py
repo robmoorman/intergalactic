@@ -20,7 +20,9 @@ from sanic import Sanic
 from intergalactic import settings
 from intergalactic.blockchain.block import Block
 from intergalactic.blockchain.blockchain import blockchain
+from intergalactic.blockchain.transaction import Transaction
 from intergalactic.peer.manager import manager
+from intergalactic.peer.publisher import broadcast
 from intergalactic.node import node
 from intergalactic.server import server
 from intergalactic.types import MessageType
@@ -52,7 +54,8 @@ async def message_handler(ws, msg):
         MessageType.PING.value: handle_ping,
         MessageType.PONG.value: handle_pong,
         MessageType.NOTIFY_NEW_PEERS.value: handle_notify_new_peers,
-        MessageType.NOTIFY_NEW_BLOCKS.value: handle_notify_new_bocks,
+        MessageType.NOTIFY_NEW_BLOCKS.value: handle_notify_new_blocks,
+        MessageType.NOTIFY_NEW_TRANSACTION.value: handle_notify_new_transaction,
         MessageType.QUERY_CONNECTED_PEERS.value: handle_query_connected_peers,
         MessageType.QUERY_LATEST_BLOCK.value: handle_query_latest_block,
         MessageType.QUERY_ALL_BLOCKS.value: handle_query_all_blocks
@@ -109,9 +112,7 @@ async def handle_notify_new_peers(ws, data):
         logger.info("Parent peers already discovered")
 
 
-async def handle_notify_new_bocks(ws, data):
-    from intergalactic.peer.publisher import broadcast
-
+async def handle_notify_new_blocks(ws, data):
     blocks = data["data"]
     latest_received_block = Block.from_dict(blocks[-1])
     latest_known_block = blockchain.get_latest_block()
@@ -146,8 +147,17 @@ async def handle_notify_new_bocks(ws, data):
                     " further action required")
 
 
+async def handle_notify_new_transaction(ws, data):
+    transaction = Transaction.from_dict(data["data"])
+
+    logger.info(f"Received transaction {transaction}")
+
+    blockchain.add_transaction(transaction)
+
+
 async def handle_query_connected_peers(ws, data):
     peers = manager.get_peers()
+
     await ws.send(json.dumps({
         "type": MessageType.NOTIFY_NEW_PEERS.value,
         "data": [str(x) for x in peers]
@@ -156,6 +166,7 @@ async def handle_query_connected_peers(ws, data):
 
 async def handle_query_latest_block(ws, data):
     block = blockchain.get_latest_block()
+
     await ws.send(json.dumps({
         "type": MessageType.NOTIFY_NEW_BLOCKS.value,
         "data": [block.to_dict()]

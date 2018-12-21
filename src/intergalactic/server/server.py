@@ -30,6 +30,7 @@ class Server:
 
         self.app.add_route(views.HealthcheckView.as_view(), '/healthcheck/')
         self.app.add_route(views.MineBlockView.as_view(), '/mine_block/')
+        self.app.add_route(views.AddTransactionView.as_view(), '/add_transaction/')
         self.app.add_websocket_route(handlers.peer_to_peer_handler, '/')
 
     def init_peer_subscribers(self, peers):

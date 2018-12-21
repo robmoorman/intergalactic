@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from intergalactic.blockchain.transaction import Transaction
+
+
 class Block:
-    def __init__(self, index, previous_hash, timestamp, hash):
+    def __init__(self, index, previous_hash, timestamp, hash, transactions):
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp
         self.hash = hash
+        self.transactions = transactions
 
     @staticmethod
     def from_dict(data):
@@ -25,7 +29,8 @@ class Block:
             data["index"],
             data["previous_hash"],
             data["timestamp"],
-            data["hash"]
+            data["hash"],
+            [Transaction.from_dict(x) for x in data["transactions"]]
         )
 
     def to_dict(self):
@@ -33,5 +38,6 @@ class Block:
             "index": self.index,
             "previous_hash": self.previous_hash,
             "timestamp": self.timestamp,
-            "hash": self.hash
+            "hash": self.hash,
+            "transactions": [x.to_dict() for x in self.transactions]
         }

@@ -16,9 +16,14 @@ import hashlib
 import json
 
 
-def create_hash(index, previous_hash, timestamp):
+def create_hash(index, previous_hash, timestamp, transactions):
     return hashlib.sha256(json.dumps({
         "index": int(index),
         "previous_hash": str(previous_hash),
-        "timestamp": str(timestamp)
+        "timestamp": str(timestamp),
+        "transactions": [{
+            "sender": str(transaction.sender),
+            "recipient": str(transaction.recipient),
+            "amount": float(transaction.amount),
+        } for transaction in transactions]
     }).encode('utf-8')).hexdigest()
