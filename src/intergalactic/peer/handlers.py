@@ -150,9 +150,14 @@ async def handle_notify_new_blocks(ws, data):
 async def handle_notify_new_transaction(ws, data):
     transaction = Transaction.from_dict(data["data"])
 
-    logger.info(f"Received transaction {transaction}")
+    verified = blockchain.verify_transaction_signature(
+        transaction.sender, transaction, transaction.signature)
 
-    blockchain.add_transaction(transaction)
+    if verified:
+        logger.info(f"Received transaction {transaction.hash}")
+        blockchain.add_transaction(transaction)
+    else:
+        logger.warning(f"Received invalid transaction {transaction.hash}")
 
 
 async def handle_query_connected_peers(ws, data):

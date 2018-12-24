@@ -30,7 +30,7 @@ Install Python packages
 
 ```
 $ pip3 install -r requirements.txt
-$ pip3 install -e .
+$ pip3 install -e .[test]
 ```
 
 ## Usage
@@ -39,6 +39,14 @@ Run the `intergalactic` blockchain
 
 ```
 $ intergalactic run
+```
+
+## Testing
+
+Run the tes suite
+
+```
+$ make test
 ```
 
 ## Runing a peer-to-peer simulation netwerk

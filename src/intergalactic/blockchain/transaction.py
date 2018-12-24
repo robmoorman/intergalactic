@@ -12,31 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import binascii
-
-from Crypto import Random
-from Crypto.Hash import SHA
-from Crypto.PublicKey import RSA
-from Crypto.Signature import PKCS1_v1_5
-
 
 class Transaction:
-    def __init__(self, sender: str, recipient: str, amount: float):
+    def __init__(self, hash: str, sender: str, recipient: str, amount: float, timestamp: int, signature: str):
+        self.hash = hash
         self.sender = sender
         self.recipient = recipient
         self.amount = amount
+        self.timestamp = timestamp
+        self.signature = signature
 
     @staticmethod
     def from_dict(data):
         return Transaction(
+            data["hash"],
             data["sender"],
             data["recipient"],
-            data["amount"]
+            data["amount"],
+            data["timestamp"],
+            data["signature"]
         )
 
     def to_dict(self):
         return {
+            "hash": self.hash,
             "sender": self.sender,
             "recipient": self.recipient,
-            "amount": self.amount
+            "amount": self.amount,
+            "timestamp": self.timestamp,
+            "signature": self.signature
         }

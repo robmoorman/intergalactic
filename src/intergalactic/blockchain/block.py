@@ -16,11 +16,13 @@ from intergalactic.blockchain.transaction import Transaction
 
 
 class Block:
-    def __init__(self, index, previous_hash, timestamp, hash, transactions):
+    def __init__(self, index, previous_hash, timestamp, hash, merkle_root, proof, transactions):
         self.index = index
         self.previous_hash = previous_hash
         self.timestamp = timestamp
         self.hash = hash
+        self.merkle_root = merkle_root
+        self.proof = proof
         self.transactions = transactions
 
     @staticmethod
@@ -30,6 +32,8 @@ class Block:
             data["previous_hash"],
             data["timestamp"],
             data["hash"],
+            data["merkle_root"],
+            data["proof"],
             [Transaction.from_dict(x) for x in data["transactions"]]
         )
 
@@ -39,5 +43,7 @@ class Block:
             "previous_hash": self.previous_hash,
             "timestamp": self.timestamp,
             "hash": self.hash,
+            "merkle_root": self.merkle_root,
+            "proof": self.proof,
             "transactions": [x.to_dict() for x in self.transactions]
         }

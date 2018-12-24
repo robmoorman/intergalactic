@@ -12,19 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-from os import environ as env
+class BlockBuilder:
+    def __init__(self):
+        pass
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DEBUG = True
-DIFFICULTY = 4  # Fixed during proof of concept
-
-BLOCKCHAIN_DB_PATH = os.path.join(BASE_DIR, '.db')
-
-BOOTSTRAP_PEERS = env.get("BOOTSTRAP_PEERS", "")
-
-MAX_PEER_CONNECTIONS = env.get("MAX_PEER_CONNECTIONS", "8")
-
-SERVER_HOST = env.get("SERVER_HOST", "0.0.0.0")
-SERVER_PORT = env.get("SERVER_PORT", "5001")
+class TransactionBuilder:
+    def __init__(self):
+        pass

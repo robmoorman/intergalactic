@@ -57,11 +57,12 @@ class AddTransactionView(HTTPMethodView):
             sender = data["sender"]
             recipient = data["recipient"]
             amount = data["amount"]
+            timestamp = data["timestamp"]
             signature = data["signature"]
 
             # Create a new transaction
             transaction = blockchain.create_transaction(
-                sender, recipient, amount, signature)
+                sender, recipient, amount, timestamp, signature)
 
         if not transaction:
             return json({

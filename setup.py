@@ -7,6 +7,14 @@ setup(
         '': 'src'
     },
     packages=find_packages('src'),
+    extras_require={
+        'test': [
+            'flake8',
+            'isort',
+            'pytest',
+            'pytest-cov'
+        ]
+    },
     entry_points={
         'console_scripts': [
             'intergalactic=intergalactic.cli:execute'

@@ -22,8 +22,10 @@ from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from datetime import timezone, datetime
 
-from intergalactic.blockchain import hasher
 from intergalactic.blockchain.block import Block
+from intergalactic.blockchain.hasher import BlockHasher, TransactionHasher
+from intergalactic.blockchain.pow import ProofOfWork
+from intergalactic.blockchain.validator import BlockchainValidator
 from intergalactic.blockchain.transaction import Transaction
 
 
@@ -37,8 +39,12 @@ class Blockchain:
         index = 0
         previous_hash = "0"
         timestamp = 1545317034183
-        hash = hasher.create_hash(index, previous_hash, timestamp, [])
-        block = Block(index, previous_hash, timestamp, hash, [])
+        merkle_root = BlockHasher().create_merkle_root([])
+        proof = 0
+        hash = BlockHasher().create_hash(
+            index, previous_hash, timestamp, merkle_root, proof)
+        block = Block(
+            index, previous_hash, timestamp, hash, merkle_root, 0, [])
         return block
 
     def mine_block(self):
@@ -46,17 +52,23 @@ class Blockchain:
         index = latest_block.index + 1
         previous_hash = latest_block.hash
         timestamp = self.get_timestamp()
-        hash = hasher.create_hash(
-            index, previous_hash, timestamp, self.transactions)
-        block = Block(index, previous_hash, timestamp, hash, self.transactions)
+        merkle_root = BlockHasher().create_merkle_root(self.transactions)
+        proof = ProofOfWork().get_proof(previous_hash, merkle_root)
+        hash = BlockHasher().create_hash(
+            index, previous_hash, timestamp, merkle_root, proof)
+        block = Block(
+            index, previous_hash, timestamp, hash, merkle_root, proof,
+            self.transactions)
 
         self.add_block(block)
         self.reset_transactions()
 
         return block
 
-    def create_transaction(self, sender: str, recipient: str, amount: float, signature: str):
-        transaction = Transaction(sender, recipient, amount)
+    def create_transaction(self, sender: str, recipient: str, amount: float, timestamp: int, signature: str):
+        hash = TransactionHasher().create_hash(
+            sender, recipient, amount, timestamp)
+        transaction = Transaction(hash, sender, recipient, amount, timestamp, signature)
         verified = self.verify_transaction_signature(sender, transaction, signature)
 
         if verified:
@@ -96,12 +108,20 @@ class Blockchain:
         try:
             pk = RSA.importKey(binascii.unhexlify(sender))
             signer = PKCS1_v1_5.new(pk)
-            hash = SHA.new(str(transaction.to_dict()).encode('utf8'))
+            hash = SHA.new(str({
+                "sender": transaction.sender,
+                "recipient": transaction.recipient,
+                "amount": transaction.amount,
+                "timestamp": transaction.timestamp
+            }).encode('utf-8'))
             verified = signer.verify(hash, binascii.unhexlify(signature))
             return verified
         except:
             pass
         return False
+
+    def validate_chain(self, chain):
+        return BlockchainValidator().validate(chain)
 
 
 blockchain = Blockchain()

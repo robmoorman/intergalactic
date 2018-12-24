@@ -16,14 +16,32 @@ import hashlib
 import json
 
 
-def create_hash(index, previous_hash, timestamp, transactions):
-    return hashlib.sha256(json.dumps({
-        "index": int(index),
-        "previous_hash": str(previous_hash),
-        "timestamp": str(timestamp),
-        "transactions": [{
-            "sender": str(transaction.sender),
-            "recipient": str(transaction.recipient),
-            "amount": float(transaction.amount),
-        } for transaction in transactions]
-    }).encode('utf-8')).hexdigest()
+class BlockHasher:
+    def __init__(self):
+        pass
+
+    def create_hash(self, index: int, previous_hash: str, timestamp: int, merkle_root: str, proof: int) -> str:
+        return hashlib.sha256(json.dumps({
+            "index": index,
+            "previous_hash": previous_hash,
+            "timestamp": timestamp,
+            "proof": proof,
+            "merkle_root": merkle_root
+        }).encode('utf-8')).hexdigest()
+
+    def create_merkle_root(self, transactions) -> str:
+        hashes = [x.hash for x in transactions]
+        return hashlib.sha256(json.dumps(hashes).encode('utf-8')).hexdigest()
+
+
+class TransactionHasher:
+    def __init__(self):
+        pass
+
+    def create_hash(self, sender: str, recipient: str, amount: float, timestamp: int) -> str:
+        return hashlib.sha256(json.dumps({
+            "sender": sender,
+            "recipient": recipient,
+            "amount": amount,
+            "timestamp": timestamp
+        }).encode('utf-8')).hexdigest()
